@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Lankan Lottery Results Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .filters {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .filter-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        select, input[type="date"] {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        select:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .results-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s;
+        }
+
+        .result-card:hover {
+            transform: translateX(5px);
+        }
+
+        .lottery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .lottery-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+        }
+
+        .lottery-board {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .lottery-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .winning-numbers {
+            margin-top: 15px;
+        }
+
+        .numbers-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .numbers-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .number-ball {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Letter ball - Blue circle */
+        .letter-ball {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(52, 152, 219, 0.4);
+            border: 3px solid #fff;
+        }
+
+        /* Zodiac ball - Square purple */
+        .zodiac-ball {
+            min-width: 80px;
+            height: 50px;
+            padding: 0 15px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(155, 89, 182, 0.4);
+            border: 3px solid #fff;
+        }
+
+        /* Super number ball - Red circle */
+        .super-ball {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.5);
+            border: 4px solid #fff;
+            animation: pulse 2s infinite;
+        }
+
+        /* Promotional ball - Green square */
+        .promo-ball {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(39, 174, 96, 0.4);
+            border: 2px solid #fff;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-results-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fee;
+            border-left: 5px solid #f44336;
+            padding: 20px;
+            border-radius: 8px;
+            color: #c00;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .filter-group {
+                grid-template-columns: 1fr;
+            }
+
+            .lottery-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .lottery-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎰 Sri Lankan Lottery Results</h1>
+            <p class="subtitle">View latest lottery results from DLB and NLB</p>
+        </header>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalResults">-</div>
+                <div class="stat-label">Total Results</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalLotteries">-</div>
+                <div class="stat-label">Lottery Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="lastUpdate">-</div>
+                <div class="stat-label">Last Updated</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="boardFilter">Filter by Board</label>
+                    <select id="boardFilter">
+                        <option value="">All Boards</option>
+                        <option value="DLB">DLB - Development Lotteries Board</option>
+                        <option value="NLB">NLB - National Lotteries Board</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <label for="lotteryFilter">Filter by Lottery</label>
+                    <select id="lotteryFilter">
+                        <option value="">All Lotteries</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <label for="dateFilter">Filter by Date</label>
+                    <input type="date" id="dateFilter">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="loadResults()">🔍 Search Results</button>
+                <button class="btn-secondary" onclick="clearFilters()">🔄 Clear Filters</button>
+                <button class="btn-secondary" onclick="triggerScrape()">⚡ Refresh Data</button>
+            </div>
+        </div>
+
+        <div class="results-container">
+            <div id="resultsArea">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading lottery results...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+
+        // Load stats on page load
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/stats`);
+                const stats = await response.json();
+                
+                document.getElementById('totalResults').textContent = stats.total_results;
+                document.getElementById('totalLotteries').textContent = stats.total_lotteries;
+                
+                if (stats.latest_scrape) {
+                    const date = new Date(stats.latest_scrape);
+                    document.getElementById('lastUpdate').textContent = date.toLocaleTimeString();
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load lottery types for dropdown
+        async function loadLotteryTypes() {
+            try {
+                const response = await fetch(`${API_BASE}/api/lotteries`);
+                const lotteries = await response.json();
+                
+                const select = document.getElementById('lotteryFilter');
+                lotteries.forEach(lottery => {
+                    const option = document.createElement('option');
+                    option.value = lottery.name;
+                    option.textContent = `${lottery.display_name} (${lottery.board})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading lottery types:', error);
+            }
+        }
+
+        // Load results based on filters
+        async function loadResults() {
+            const resultsArea = document.getElementById('resultsArea');
+            resultsArea.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading results...</p></div>';
+
+            try {
+                const board = document.getElementById('boardFilter').value;
+                const lottery = document.getElementById('lotteryFilter').value;
+                const date = document.getElementById('dateFilter').value;
+
+                let url = `${API_BASE}/api/results/latest?limit=50`;
+                
+                if (board) {
+                    url += `&board=${board}`;
+                }
+
+                // If specific lottery selected
+                if (lottery) {
+                    url = `${API_BASE}/api/results/${lottery}?limit=50`;
+                }
+
+                // If date selected
+                if (date) {
+                    url = `${API_BASE}/api/results/date/${date}`;
+                }
+
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const results = await response.json();
+                displayResults(results);
+
+            } catch (error) {
+                resultsArea.innerHTML = `
+                    <div class="error">
+                        <strong>Error loading results:</strong> ${error.message}
+                        <br><br>
+                        Make sure the API server is running on ${API_BASE}
+                    </div>
+                `;
+            }
+        }
+
+        // Display results
+        function displayResults(results) {
+            const resultsArea = document.getElementById('resultsArea');
+
+            if (!results || results.length === 0) {
+                resultsArea.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🎲</div>
+                        <h2>No Results Found</h2>
+                        <p>Try adjusting your filters or refresh the data</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = results.map(result => {
+                const date = new Date(result.draw_date);
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+
+                // Handle both old format (plain strings) and new format (objects with type/value)
+                const numbers = result.winning_numbers && result.winning_numbers.length > 0
+                    ? result.winning_numbers.map(num => {
+                        // New format: {type: "letter", value: "A"}
+                        if (typeof num === 'object' && num.value !== undefined) {
+                            const ballClass = num.type === 'letter' ? 'letter-ball' : 
+                                            num.type === 'zodiac' ? 'zodiac-ball' :
+                                            num.type === 'super' ? 'super-ball' :
+                                            num.type === 'promotional' ? 'promo-ball' : 'number-ball';
+                            return `<div class="${ballClass}" title="${num.type}">${num.value}</div>`;
+                        }
+                        // Old format: plain string/number
+                        return `<div class="number-ball">${num}</div>`;
+                    }).join('')
+                    : '<p style="color: #999;">No winning numbers available</p>';
+
+                return `
+                    <div class="result-card">
+                        <div class="lottery-header">
+                            <div class="lottery-name">${result.lottery_name.replace(/_/g, ' ')}</div>
+                            <div class="lottery-board">Board: ${getLotteryBoard(result.lottery_name)}</div>
+                        </div>
+                        
+                        <div class="lottery-info">
+                            <div class="info-item">
+                                <div class="info-label">Draw Number</div>
+                                <div class="info-value">${result.draw_number || 'N/A'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Draw Date</div>
+                                <div class="info-value">${formattedDate}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Prize Amount</div>
+                                <div class="info-value">${result.prize_amount || 'N/A'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Scraped At</div>
+                                <div class="info-value">${new Date(result.scraped_at).toLocaleTimeString()}</div>
+                            </div>
+                        </div>
+
+                        <div class="winning-numbers">
+                            <div class="numbers-label"><strong>Winning Numbers:</strong></div>
+                            <div class="numbers-grid">${numbers}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            resultsArea.innerHTML = html;
+        }
+
+        // Get lottery board
+        function getLotteryBoard(lotteryName) {
+            const dlbLotteries = ['sasiri', 'kapruka', 'shanida', 'super_ball', 'ada_kotipathi', 'jaya_sampatha', 'lagna_wasana', 'supiri_dhana_sampatha'];
+            return dlbLotteries.includes(lotteryName) ? 'DLB' : 'NLB';
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('boardFilter').value = '';
+            document.getElementById('lotteryFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            loadResults();
+        }
+
+        // Trigger scrape
+        async function triggerScrape() {
+            const resultsArea = document.getElementById('resultsArea');
+            resultsArea.innerHTML = '<div class="loading"><div class="spinner"></div><p>Fetching latest data from websites...</p></div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/scrape`, { method: 'POST' });
+                const result = await response.json();
+                
+                alert(`Scrape completed! Saved ${result.message}`);
+                loadStats();
+                loadResults();
+            } catch (error) {
+                alert('Error triggering scrape: ' + error.message);
+                loadResults();
+            }
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            loadStats();
+            loadLotteryTypes();
+            loadResults();
+        };
+    </script>
+</body>
+</html>

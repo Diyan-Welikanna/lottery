@@ -1,0 +1,10 @@
+<script>
+ function setCookie(cname, cvalue, exdays) {
+		  const d = new Date();
+		  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+		  let expires = "expires="+ d.toUTCString();
+		  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+		}	
+		setCookie('human','8ebe479ca3fecf1ee07e37b396a0c2b0846ae868',1);
+		location.reload() ;
+</script>
