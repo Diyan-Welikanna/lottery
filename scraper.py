@@ -45,7 +45,8 @@ class DLBScraper:
             soup = BeautifulSoup(response.content, 'html.parser')
             
             if self.debug:
-                self._save_debug_html(soup, 'dlb_debug.html')
+                os.makedirs('dlb/misc', exist_ok=True)
+                self._save_debug_html(soup, 'dlb/misc/dlb_debug.html')
             
             results = []
             
@@ -365,7 +366,8 @@ class NLBScraper:
             soup = BeautifulSoup(response.content, 'html.parser')
             
             if self.debug:
-                debug_file = f"nlb_{lottery_slug}_{draw_number}_scrape.html"
+                os.makedirs(f'nlb/{lottery_slug}', exist_ok=True)
+                debug_file = f"nlb/{lottery_slug}/nlb_{lottery_slug}_{draw_number}_scrape.html"
                 self._save_debug_html(soup, debug_file)
             
             # Parse the result page
@@ -477,7 +479,8 @@ class NLBScraper:
             soup = BeautifulSoup(response.content, 'html.parser')
             
             if self.debug:
-                self._save_debug_html(soup, 'nlb_debug.html')
+                os.makedirs('nlb/misc', exist_ok=True)
+                self._save_debug_html(soup, 'nlb/misc/nlb_debug.html')
             
             results = []
             
