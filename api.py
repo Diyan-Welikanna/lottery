@@ -8,6 +8,7 @@ import os
 
 from database import get_db, LotteryResult, LotteryType, init_db
 from scraper import run_scraper
+from auth import get_api_key
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -93,7 +94,10 @@ async def root():
 
 
 @app.get("/api/lotteries", response_model=List[LotteryTypeResponse])
-async def get_lotteries(db: Session = Depends(get_db)):
+async def get_lotteries(
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
+):
     """Get all available lottery types"""
     lotteries = db.query(LotteryType).filter(LotteryType.is_active == 1).all()
     return lotteries
@@ -103,7 +107,8 @@ async def get_lotteries(db: Session = Depends(get_db)):
 async def get_latest_results(
     limit: int = Query(10, ge=1, le=100),
     board: Optional[str] = Query(None, description="Filter by board: DLB or NLB"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
 ):
     """Get latest lottery results across all lotteries"""
     query = db.query(LotteryResult).order_by(LotteryResult.draw_date.desc())
@@ -122,7 +127,8 @@ async def get_latest_results(
 async def get_results_by_lottery(
     lottery_name: str,
     limit: int = Query(10, ge=1, le=100),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
 ):
     """Get results for a specific lottery"""
     results = db.query(LotteryResult).filter(
@@ -138,7 +144,8 @@ async def get_results_by_lottery(
 @app.get("/api/results/date/{date}", response_model=List[LotteryResultResponse])
 async def get_results_by_date(
     date: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
 ):
     """Get results for a specific date (format: YYYY-MM-DD)"""
     try:
@@ -158,7 +165,8 @@ async def get_results_by_date(
 @app.post("/api/verify", response_model=VerifyTicketResponse)
 async def verify_ticket(
     request: VerifyTicketRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
 ):
     """Verify if ticket numbers match winning numbers"""
     
@@ -217,7 +225,10 @@ async def trigger_scrape():
 
 
 @app.get("/api/stats")
-async def get_stats(db: Session = Depends(get_db)):
+async def get_stats(
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
+):
     """Get database statistics"""
     total_results = db.query(LotteryResult).count()
     total_lotteries = db.query(LotteryType).filter(LotteryType.is_active == 1).count()

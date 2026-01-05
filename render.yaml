@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: lottery-scraper-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: DATABASE_PATH
+        value: /opt/render/project/data/lottery_results.db
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    disk:
+      name: lottery-data
+      mountPath: /opt/render/project/data
+      sizeGB: 1
